@@ -1,0 +1,3 @@
+Create a functional component in React-JS that displays a 5 Vehicle Info Card in a row with details like Model, Manufacturer, Year, and Fuel Type. Use inline CSS to style the card layout and appearance.
+Develop a React-JS application using a functional component that renders a list of countries with their capitals using .map(). Each list item must have a unique key, and the list should be styled using an external CSS file.
+Build a functional component in React-JS that renders a grid of famous landmarks (name, location, country). Use external CSS to apply styles like borders, spacing, and hover effects to each item.
