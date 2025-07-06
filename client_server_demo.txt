@@ -1,0 +1,32 @@
+🌐 DEMONSTRATION 3: Client-Server Architecture
+--------------------------------------------------
+Starting TCP Client-Server Communication Demo...
+
+🖥️  Server started on localhost:8888
+Waiting for client connections...
+
+--- Client 1 Communication ---
+📱 Client connected from ('127.0.0.1', 47366)
+📨 Received: Hello from Client 1!
+📤 Client sent: Hello from Client 1!
+📥 Client received: Hello Client! Server received: 'Hello from Client 1!' at 07:45:01
+✅ Connection 1 completed
+
+--- Client 2 Communication ---
+📱 Client connected from ('127.0.0.1', 47380)
+📨 Received: Network request from Client 2
+📤 Client sent: Network request from Client 2
+📥 Client received: Hello Client! Server received: 'Network request from Client 2' at 07:45:03
+✅ Connection 2 completed
+
+--- Client 3 Communication ---
+📱 Client connected from ('127.0.0.1', 47390)
+📨 Received: Data transfer from Client 3
+📤 Client sent: Data transfer from Client 3
+📥 Client received: Hello Client! Server received: 'Data transfer from Client 3' at 07:45:05
+✅ Connection 3 completed
+
+✅ Client-Server demonstration completed!
+
+==================================================
+
