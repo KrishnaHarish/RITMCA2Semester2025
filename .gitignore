@@ -1,0 +1,14 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Ignore temporary output files
+*.txt
+*.log
+
+# Ignore temp directories
+tmp/
+temp/
