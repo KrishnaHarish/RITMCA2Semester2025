@@ -17,7 +17,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(helmet()); // Security headers
+app.use(helmet({
+  contentSecurityPolicy: false,
+})); // Security headers
 app.use(cors()); // Enable CORS
 app.use(morgan('combined')); // Logging
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
@@ -27,21 +29,35 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/crop_yield_prediction', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+let isDbConnected = false;
+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/crop_yield_prediction')
 .then(() => {
   console.log('✅ Connected to MongoDB successfully');
+  isDbConnected = true;
 })
 .catch((error) => {
   console.error('❌ MongoDB connection error:', error);
-  process.exit(1);
+  console.log('⚠️  Server will continue without database functionality');
+  isDbConnected = false;
 });
 
-// Routes
-app.use('/api/v1/crops', cropRoutes);
-app.use('/api/v1/predictions', predictionRoutes);
+// Middleware to check database connection
+const checkDbConnection = (req, res, next) => {
+  if (!isDbConnected) {
+    return res.status(503).json({
+      success: false,
+      error: 'Database connection unavailable',
+      message: 'The database service is currently unavailable. Please try again later.',
+      code: 'DB_CONNECTION_ERROR'
+    });
+  }
+  next();
+};
+
+// Routes with database connection middleware
+app.use('/api/v1/crops', checkDbConnection, cropRoutes);
+app.use('/api/v1/predictions', checkDbConnection, predictionRoutes);
 
 // Serve the main application page
 app.get('/', (req, res) => {
