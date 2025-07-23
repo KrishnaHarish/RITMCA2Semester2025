@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Yield Prediction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: transparent;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-unit {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .recommendations {
+            margin-top: 20px;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .recommendation-item.high {
+            border-left-color: #dc3545;
+        }
+
+        .recommendation-item.medium {
+            border-left-color: #ffc107;
+        }
+
+        .crop-list {
+            margin-top: 20px;
+        }
+
+        .crop-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .crop-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .crop-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .success {
+            background: #d1edff;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌾 Crop Yield Prediction System</h1>
+            <p>AI-powered agricultural analytics for better crop management</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('predict')">Yield Prediction</button>
+            <button class="nav-tab" onclick="showTab('manage')">Crop Management</button>
+            <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+        </nav>
+
+        <!-- Yield Prediction Tab -->
+        <div id="predict" class="tab-content active">
+            <h2>🔮 Predict Crop Yield</h2>
+            <p>Enter your crop and environmental data to get yield predictions and recommendations.</p>
+            
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cropType">Crop Type *</label>
+                        <select id="cropType" name="cropType" required>
+                            <option value="">Select Crop Type</option>
+                            <option value="Rice">Rice</option>
+                            <option value="Wheat">Wheat</option>
+                            <option value="Corn">Corn</option>
+                            <option value="Barley">Barley</option>
+                            <option value="Soybeans">Soybeans</option>
+                            <option value="Cotton">Cotton</option>
+                            <option value="Sugarcane">Sugarcane</option>
+                            <option value="Potato">Potato</option>
+                            <option value="Tomato">Tomato</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="season">Season *</label>
+                        <select id="season" name="season" required>
+                            <option value="">Select Season</option>
+                            <option value="Kharif">Kharif (Monsoon)</option>
+                            <option value="Rabi">Rabi (Winter)</option>
+                            <option value="Zaid">Zaid (Summer)</option>
+                            <option value="Whole Year">Whole Year</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="area">Area (hectares) *</label>
+                        <input type="number" id="area" name="area" min="0.1" max="10000" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rainfall">Rainfall (mm) *</label>
+                        <input type="number" id="rainfall" name="rainfall" min="0" max="5000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="avgTemp">Average Temperature (°C) *</label>
+                        <input type="number" id="avgTemp" name="avgTemp" min="-20" max="60" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minTemp">Minimum Temperature (°C) *</label>
+                        <input type="number" id="minTemp" name="minTemp" min="-30" max="50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxTemp">Maximum Temperature (°C) *</label>
+                        <input type="number" id="maxTemp" name="maxTemp" min="-10" max="70" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="humidity">Humidity (%) *</label>
+                        <input type="number" id="humidity" name="humidity" min="0" max="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="soilType">Soil Type *</label>
+                        <select id="soilType" name="soilType" required>
+                            <option value="">Select Soil Type</option>
+                            <option value="Alluvial">Alluvial</option>
+                            <option value="Clay">Clay</option>
+                            <option value="Sandy">Sandy</option>
+                            <option value="Loamy">Loamy</option>
+                            <option value="Red">Red</option>
+                            <option value="Black">Black</option>
+                            <option value="Laterite">Laterite</option>
+                            <option value="Desert">Desert</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pH">Soil pH *</label>
+                        <input type="number" id="pH" name="pH" min="0" max="14" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State *</label>
+                        <input type="text" id="state" name="state" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="district">District *</label>
+                        <input type="text" id="district" name="district" required>
+                    </div>
+                </div>
+
+                <h3>💨 Fertilizer Details (Optional)</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nitrogen">Nitrogen (kg/ha)</label>
+                        <input type="number" id="nitrogen" name="nitrogen" min="0" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phosphorus">Phosphorus (kg/ha)</label>
+                        <input type="number" id="phosphorus" name="phosphorus" min="0" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="potassium">Potassium (kg/ha)</label>
+                        <input type="number" id="potassium" name="potassium" min="0" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="organic">Organic Fertilizer (kg/ha)</label>
+                        <input type="number" id="organic" name="organic" min="0" value="0">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">🔮 Predict Yield</button>
+            </form>
+
+            <div id="predictionResult" class="result-section" style="display: none;">
+                <!-- Prediction results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Crop Management Tab -->
+        <div id="manage" class="tab-content">
+            <h2>🌱 Crop Management</h2>
+            <p>Add, view, and manage your crop data records.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <button class="btn" onclick="showAddCropForm()">➕ Add New Crop</button>
+                <button class="btn" onclick="loadCrops()" style="margin-left: 10px;">🔄 Refresh List</button>
+            </div>
+
+            <div id="addCropForm" style="display: none; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>Add New Crop Record</h3>
+                <form id="cropForm">
+                    <!-- Same form fields as prediction form, plus actual yield -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cropTypeCrop">Crop Type *</label>
+                            <select id="cropTypeCrop" name="cropType" required>
+                                <option value="">Select Crop Type</option>
+                                <option value="Rice">Rice</option>
+                                <option value="Wheat">Wheat</option>
+                                <option value="Corn">Corn</option>
+                                <option value="Barley">Barley</option>
+                                <option value="Soybeans">Soybeans</option>
+                                <option value="Cotton">Cotton</option>
+                                <option value="Sugarcane">Sugarcane</option>
+                                <option value="Potato">Potato</option>
+                                <option value="Tomato">Tomato</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seasonCrop">Season *</label>
+                            <select id="seasonCrop" name="season" required>
+                                <option value="">Select Season</option>
+                                <option value="Kharif">Kharif (Monsoon)</option>
+                                <option value="Rabi">Rabi (Winter)</option>
+                                <option value="Zaid">Zaid (Summer)</option>
+                                <option value="Whole Year">Whole Year</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="areaCrop">Area (hectares) *</label>
+                            <input type="number" id="areaCrop" name="area" min="0.1" max="10000" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="actualYield">Actual Yield (tons/ha)</label>
+                            <input type="number" id="actualYield" name="actualYield" min="0" step="0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="plantingDate">Planting Date *</label>
+                            <input type="date" id="plantingDate" name="plantingDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="harvestDate">Harvest Date</label>
+                            <input type="date" id="harvestDate" name="harvestDate">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">💾 Save Crop Record</button>
+                    <button type="button" class="btn" onclick="hideAddCropForm()" style="margin-left: 10px; background: #6c757d;">❌ Cancel</button>
+                </form>
+            </div>
+
+            <div id="cropsList" class="crop-list">
+                <!-- Crops will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <h2>📊 Analytics & Statistics</h2>
+            <p>View comprehensive analytics and insights about crop performance.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <button class="btn" onclick="loadStatistics()">📈 Load Statistics</button>
+            </div>
+
+            <div id="statisticsResult" class="result-section" style="display: none;">
+                <!-- Statistics will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API base URL
+        const API_BASE = '/api/v1';
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+        }
+
+        // Prediction form handler
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                cropType: formData.get('cropType'),
+                season: formData.get('season'),
+                area: parseFloat(formData.get('area')),
+                rainfall: parseFloat(formData.get('rainfall')),
+                temperature: {
+                    average: parseFloat(formData.get('avgTemp')),
+                    min: parseFloat(formData.get('minTemp')),
+                    max: parseFloat(formData.get('maxTemp'))
+                },
+                humidity: parseFloat(formData.get('humidity')),
+                soilType: formData.get('soilType'),
+                pH: parseFloat(formData.get('pH')),
+                location: {
+                    state: formData.get('state'),
+                    district: formData.get('district')
+                },
+                fertilizer: {
+                    nitrogen: parseFloat(formData.get('nitrogen')) || 0,
+                    phosphorus: parseFloat(formData.get('phosphorus')) || 0,
+                    potassium: parseFloat(formData.get('potassium')) || 0,
+                    organic: parseFloat(formData.get('organic')) || 0
+                }
+            };
+
+            try {
+                document.getElementById('predictionResult').innerHTML = '<div class="loading">🔄 Calculating yield prediction...</div>';
+                document.getElementById('predictionResult').style.display = 'block';
+
+                const response = await fetch(`${API_BASE}/predictions/yield`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayPredictionResult(result.data);
+                } else {
+                    throw new Error(result.message || 'Prediction failed');
+                }
+            } catch (error) {
+                document.getElementById('predictionResult').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        });
+
+        // Display prediction results
+        function displayPredictionResult(data) {
+            const html = `
+                <h3>🎯 Prediction Results</h3>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <h3>Predicted Yield</h3>
+                        <div class="result-value">${data.predictedYield}</div>
+                        <div class="result-unit">${data.unit}</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Total Production</h3>
+                        <div class="result-value">${data.totalProduction}</div>
+                        <div class="result-unit">tons</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Confidence Score</h3>
+                        <div class="result-value">${data.confidenceScore}%</div>
+                        <div class="result-unit">reliability</div>
+                    </div>
+                </div>
+
+                ${data.historicalComparison.recordCount > 0 ? `
+                <h4>📊 Historical Comparison</h4>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <h3>Historical Average</h3>
+                        <div class="result-value">${data.historicalComparison.averageYield}</div>
+                        <div class="result-unit">tons/ha (${data.historicalComparison.recordCount} records)</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Yield Range</h3>
+                        <div class="result-value">${data.historicalComparison.yieldRange.min} - ${data.historicalComparison.yieldRange.max}</div>
+                        <div class="result-unit">tons/ha</div>
+                    </div>
+                </div>
+                ` : '<p><em>No historical data available for comparison</em></p>'}
+
+                ${data.recommendations.length > 0 ? `
+                <div class="recommendations">
+                    <h4>💡 Recommendations</h4>
+                    ${data.recommendations.map(rec => `
+                        <div class="recommendation-item ${rec.priority.toLowerCase()}">
+                            <strong>${rec.category} (${rec.priority} Priority):</strong> ${rec.message}
+                            ${rec.impact ? `<br><em>Impact: ${rec.impact}</em>` : ''}
+                            ${rec.suggestion ? `<br><em>Suggestion: ${rec.suggestion}</em>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                <div style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+                    <p><strong>Methodology:</strong> ${data.methodology}</p>
+                    <p><strong>Prediction Date:</strong> ${new Date(data.predictionDate).toLocaleString()}</p>
+                </div>
+            `;
+
+            document.getElementById('predictionResult').innerHTML = html;
+        }
+
+        // Crop management functions
+        function showAddCropForm() {
+            document.getElementById('addCropForm').style.display = 'block';
+        }
+
+        function hideAddCropForm() {
+            document.getElementById('addCropForm').style.display = 'none';
+            document.getElementById('cropForm').reset();
+        }
+
+        // Load crops list
+        async function loadCrops() {
+            try {
+                document.getElementById('cropsList').innerHTML = '<div class="loading">🔄 Loading crops...</div>';
+
+                const response = await fetch(`${API_BASE}/crops?limit=20&sortBy=createdAt&sortOrder=desc`);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayCropsList(result.data.crops);
+                } else {
+                    throw new Error(result.message || 'Failed to load crops');
+                }
+            } catch (error) {
+                document.getElementById('cropsList').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Display crops list
+        function displayCropsList(crops) {
+            if (crops.length === 0) {
+                document.getElementById('cropsList').innerHTML = '<p><em>No crop records found. Add your first crop record!</em></p>';
+                return;
+            }
+
+            const html = crops.map(crop => `
+                <div class="crop-item">
+                    <h3>${crop.cropType} - ${crop.season} Season</h3>
+                    <div class="crop-meta">
+                        <div><strong>Area:</strong> ${crop.area} ha</div>
+                        <div><strong>Location:</strong> ${crop.location.district}, ${crop.location.state}</div>
+                        <div><strong>Predicted Yield:</strong> ${crop.predictedYield || 'N/A'} tons/ha</div>
+                        <div><strong>Actual Yield:</strong> ${crop.actualYield || 'N/A'} tons/ha</div>
+                        <div><strong>Planting Date:</strong> ${new Date(crop.plantingDate).toLocaleDateString()}</div>
+                        <div><strong>Soil Type:</strong> ${crop.soilType}</div>
+                        <div><strong>pH:</strong> ${crop.pH}</div>
+                        <div><strong>Rainfall:</strong> ${crop.rainfall} mm</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('cropsList').innerHTML = html;
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                document.getElementById('statisticsResult').innerHTML = '<div class="loading">🔄 Loading statistics...</div>';
+                document.getElementById('statisticsResult').style.display = 'block';
+
+                const response = await fetch(`${API_BASE}/crops/statistics`);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayStatistics(result.data);
+                } else {
+                    throw new Error(result.message || 'Failed to load statistics');
+                }
+            } catch (error) {
+                document.getElementById('statisticsResult').innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Display statistics
+        function displayStatistics(data) {
+            const html = `
+                <h3>📊 Overall Statistics</h3>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <h3>Total Crops</h3>
+                        <div class="result-value">${data.overall.totalCrops}</div>
+                        <div class="result-unit">records</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Total Area</h3>
+                        <div class="result-value">${data.overall.totalArea?.toFixed(1) || 0}</div>
+                        <div class="result-unit">hectares</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Avg Predicted Yield</h3>
+                        <div class="result-value">${data.overall.avgPredictedYield?.toFixed(2) || 0}</div>
+                        <div class="result-unit">tons/ha</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Avg Actual Yield</h3>
+                        <div class="result-value">${data.overall.avgActualYield?.toFixed(2) || 'N/A'}</div>
+                        <div class="result-unit">tons/ha</div>
+                    </div>
+                </div>
+
+                ${data.cropDistribution.length > 0 ? `
+                <h4>🌾 Crop Distribution</h4>
+                <div class="crop-list">
+                    ${data.cropDistribution.map(crop => `
+                        <div class="crop-item">
+                            <h3>${crop._id}</h3>
+                            <div class="crop-meta">
+                                <div><strong>Records:</strong> ${crop.count}</div>
+                                <div><strong>Total Area:</strong> ${crop.totalArea.toFixed(1)} ha</div>
+                                <div><strong>Average Yield:</strong> ${crop.avgYield?.toFixed(2) || 'N/A'} tons/ha</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+
+                ${data.seasonalDistribution.length > 0 ? `
+                <h4>🗓️ Seasonal Distribution</h4>
+                <div class="result-grid">
+                    ${data.seasonalDistribution.map(season => `
+                        <div class="result-card">
+                            <h3>${season._id}</h3>
+                            <div class="result-value">${season.count}</div>
+                            <div class="result-unit">crops (${season.avgYield?.toFixed(2) || 'N/A'} tons/ha avg)</div>
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('statisticsResult').innerHTML = html;
+        }
+
+        // Load crops on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCrops();
+        });
+    </script>
+</body>
+</html>
