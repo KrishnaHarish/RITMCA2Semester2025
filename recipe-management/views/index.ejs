@@ -3,9 +3,9 @@
     <div class="container">
         <h1 class="display-4 fw-bold mb-3">
             <i class="fas fa-utensils me-3"></i>
-            Recipe Management System
+            Welcome to My Cooking Blog
         </h1>
-        <p class="lead mb-4">Discover, create, and share amazing recipes with the world</p>
+        <p class="lead mb-4">Delicious Recipes & Cooking Tips</p>
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
             <a href="/recipes" class="btn btn-light btn-lg me-md-2">
                 <i class="fas fa-search me-2"></i>
@@ -98,6 +98,23 @@
     </div>
 </div>
 
+<!-- Newsletter Subscription Section -->
+<div class="text-center bg-light p-5 rounded">
+    <h2>Subscribe for More Recipes</h2>
+    <p class="text-muted mb-4">Get the latest recipes and cooking tips delivered to your inbox!</p>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="email" id="newsletterEmail" class="form-control" placeholder="Enter your email address">
+                <button class="btn btn-primary" type="button" onclick="subscribeNewsletter()">
+                    <i class="fas fa-paper-plane me-2"></i>Subscribe
+                </button>
+            </div>
+            <div id="subscriptionAlert" class="alert" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     loadRecentRecipes();
@@ -172,5 +189,36 @@ async function loadStatistics() {
     } catch (error) {
         console.error('Error loading statistics:', error);
     }
+}
+
+async function subscribeNewsletter() {
+    const email = document.getElementById('newsletterEmail').value;
+    const alertDiv = document.getElementById('subscriptionAlert');
+    
+    if (!email) {
+        showAlert('Please enter a valid email address.', 'danger');
+        return;
+    }
+    
+    try {
+        const response = await axios.post('/api/subscribe', { email });
+        showAlert(response.data.message, 'success');
+        document.getElementById('newsletterEmail').value = '';
+    } catch (error) {
+        showAlert('Subscription failed. Please try again later.', 'danger');
+        console.error('Subscription error:', error);
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.getElementById('subscriptionAlert');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    alertDiv.style.display = 'block';
+    
+    // Hide alert after 3 seconds
+    setTimeout(() => {
+        alertDiv.style.display = 'none';
+    }, 3000);
 }
 </script>
