@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include('partials/navbar') %>
+    
+    <!-- Alert Messages -->
+    <div id="alert-container"></div>
+    
+    <!-- Search and Filter Section -->
+    <section class="search-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center mb-4">Discover Amazing Recipes</h1>
+                    
+                    <!-- Search Bar -->
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-md-8 col-lg-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg" 
+                                       id="search-input" placeholder="Search recipes...">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filter Buttons -->
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <h6 class="fw-bold mb-2">Category:</h6>
+                            <div class="filter-buttons">
+                                <button class="btn btn-outline-primary btn-sm filter-btn" 
+                                        data-filter="category" data-value="">All</button>
+                                <button class="btn btn-outline-primary btn-sm filter-btn" 
+                                        data-filter="category" data-value="Appetizer">Appetizers</button>
+                                <button class="btn btn-outline-primary btn-sm filter-btn" 
+                                        data-filter="category" data-value="Main Course">Main Course</button>
+                                <button class="btn btn-outline-primary btn-sm filter-btn" 
+                                        data-filter="category" data-value="Dessert">Desserts</button>
+                                <button class="btn btn-outline-primary btn-sm filter-btn" 
+                                        data-filter="category" data-value="Breakfast">Breakfast</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="fw-bold mb-2">Cuisine:</h6>
+                            <div class="filter-buttons">
+                                <button class="btn btn-outline-secondary btn-sm filter-btn" 
+                                        data-filter="cuisine" data-value="">All</button>
+                                <button class="btn btn-outline-secondary btn-sm filter-btn" 
+                                        data-filter="cuisine" data-value="Italian">Italian</button>
+                                <button class="btn btn-outline-secondary btn-sm filter-btn" 
+                                        data-filter="cuisine" data-value="Indian">Indian</button>
+                                <button class="btn btn-outline-secondary btn-sm filter-btn" 
+                                        data-filter="cuisine" data-value="Chinese">Chinese</button>
+                                <button class="btn btn-outline-secondary btn-sm filter-btn" 
+                                        data-filter="cuisine" data-value="Mexican">Mexican</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="fw-bold mb-2">Difficulty:</h6>
+                            <div class="filter-buttons">
+                                <button class="btn btn-outline-success btn-sm filter-btn" 
+                                        data-filter="difficulty" data-value="">All</button>
+                                <button class="btn btn-outline-success btn-sm filter-btn" 
+                                        data-filter="difficulty" data-value="Easy">Easy</button>
+                                <button class="btn btn-outline-warning btn-sm filter-btn" 
+                                        data-filter="difficulty" data-value="Medium">Medium</button>
+                                <button class="btn btn-outline-danger btn-sm filter-btn" 
+                                        data-filter="difficulty" data-value="Hard">Hard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Recipes Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row" id="recipes-container">
+                <!-- Recipes will be loaded here -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading recipes...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav id="pagination-nav" style="display: none;">
+                        <ul class="pagination justify-content-center" id="pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/js/auth.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Load recipes when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadRecipes();
+        });
+
+        // Load recipes function
+        async function loadRecipes() {
+            const container = document.getElementById('recipes-container');
+            
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const filters = Object.fromEntries(urlParams);
+                
+                const recipes = await recipeManager.getRecipes(filters);
+                
+                if (recipes && recipes.length > 0) {
+                    recipeManager.renderRecipes(recipes, 'recipes-container');
+                } else {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No recipes found</h4>
+                            <p class="text-muted">
+                                Database connection required to load recipes.<br>
+                                This is a demo of the frontend interface.
+                            </p>
+                            <a href="/create-recipe" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Create First Recipe
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading recipes:', error);
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+                        <h4 class="text-muted">Unable to load recipes</h4>
+                        <p class="text-muted">
+                            Please check your connection or try again later.<br>
+                            <small>Note: This demo requires MongoDB connection for full functionality.</small>
+                        </p>
+                        <button onclick="loadRecipes()" class="btn btn-outline-primary">
+                            <i class="fas fa-redo me-2"></i>Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize search manager
+        searchManager.init();
+    </script>
+</body>
+</html>

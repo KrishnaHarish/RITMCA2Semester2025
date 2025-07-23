@@ -1,0 +1,331 @@
+/* Custom Styles for Cooking Blog */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Feature Cards */
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 10px;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Recipe Cards */
+.recipe-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.recipe-card img {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.recipe-card .card-body {
+    padding: 1.5rem;
+}
+
+.recipe-meta {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+}
+
+.recipe-meta i {
+    margin-right: 0.25rem;
+}
+
+/* Rating Stars */
+.rating-stars {
+    color: #ffc107;
+}
+
+.rating-stars .far {
+    color: #e9ecef;
+}
+
+/* Difficulty Badges */
+.difficulty-easy {
+    background-color: var(--success-color);
+}
+
+.difficulty-medium {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+}
+
+.difficulty-hard {
+    background-color: var(--danger-color);
+}
+
+/* Navigation */
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn {
+    font-weight: 500;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Alert Messages */
+.alert {
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* Ingredients List */
+.ingredients-list {
+    background-color: var(--light-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.ingredients-list ul {
+    margin-bottom: 0;
+}
+
+.ingredients-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.ingredients-list li:last-child {
+    border-bottom: none;
+}
+
+/* Instructions */
+.instructions-list {
+    counter-reset: step-counter;
+}
+
+.instruction-step {
+    counter-increment: step-counter;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: var(--light-color);
+    border-radius: 10px;
+    position: relative;
+}
+
+.instruction-step::before {
+    content: counter(step-counter);
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.instruction-step-content {
+    margin-left: 50px;
+}
+
+/* Nutrition Info */
+.nutrition-info {
+    background-color: var(--light-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.nutrition-item {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.nutrition-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.nutrition-label {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+}
+
+/* Recipe Meta Info */
+.recipe-meta-info {
+    background-color: var(--light-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.meta-item {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.meta-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.meta-label {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+}
+
+/* Search and Filter */
+.search-section {
+    background-color: var(--light-color);
+    padding: 2rem 0;
+}
+
+.filter-buttons .btn {
+    margin: 0.25rem;
+}
+
+/* Profile Section */
+.profile-section {
+    background-color: var(--light-color);
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Loading Spinner */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 60vh;
+        text-align: center;
+    }
+    
+    .hero-section .display-4 {
+        font-size: 2rem;
+    }
+    
+    .recipe-card img {
+        height: 180px;
+    }
+    
+    .instruction-step::before {
+        position: relative;
+        margin-bottom: 0.5rem;
+    }
+    
+    .instruction-step-content {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-card {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light-color: #2d3748;
+        --dark-color: #f7fafc;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar, .footer, .btn, .rating-section {
+        display: none !important;
+    }
+    
+    .recipe-card {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+}
