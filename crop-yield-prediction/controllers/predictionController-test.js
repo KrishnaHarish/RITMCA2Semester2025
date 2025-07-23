@@ -157,7 +157,7 @@ const getMockHistoricalData = (inputData) => {
 };
 
 // Generate recommendations
-const generateRecommendations = (data, historicalData) => {
+const generateRecommendations = (data, _historicalData) => {
   const recommendations = [];
   
   const rainfallFactor = getRainfallFactor(data.cropType, data.rainfall);

@@ -27,17 +27,13 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/crop_yield_prediction', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('✅ Connected to MongoDB successfully');
-})
-.catch((error) => {
-  console.error('❌ MongoDB connection error:', error);
-  process.exit(1);
-});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/crop_yield_prediction')
+  .then(() => {
+    console.log('✅ Connected to MongoDB successfully');
+  })
+  .catch((error) => {
+    console.warn('⚠️ MongoDB connection failed, running in demo mode:', error.message);
+  });
 
 // Routes
 app.use('/api/v1/crops', cropRoutes);

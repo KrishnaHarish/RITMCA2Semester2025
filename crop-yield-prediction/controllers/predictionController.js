@@ -1,5 +1,37 @@
 const Crop = require('../models/Crop');
 const Joi = require('joi');
+const mongoose = require('mongoose');
+
+// Mock historical data generator (for demo mode)
+const getMockHistoricalData = (inputData) => {
+  // Get base yield for the crop type
+  const baseYields = {
+    'Rice': 4.5, 'Wheat': 3.2, 'Corn': 5.8, 'Barley': 2.8, 'Soybeans': 2.5,
+    'Cotton': 1.8, 'Sugarcane': 70, 'Potato': 25, 'Tomato': 40, 'Other': 3.0
+  };
+  const baseYield = baseYields[inputData.cropType] || 3.0;
+  const records = Math.floor(Math.random() * 15) + 5; // 5-20 records
+  
+  return {
+    averageYield: Math.round((baseYield + (Math.random() - 0.5) * 2) * 100) / 100,
+    recordCount: records,
+    yieldRange: {
+      min: Math.round((baseYield * 0.6) * 100) / 100,
+      max: Math.round((baseYield * 1.4) * 100) / 100
+    },
+    recentCrops: [
+      {
+        id: 'mock1',
+        actualYield: Math.round((baseYield + Math.random()) * 100) / 100,
+        predictedYield: Math.round((baseYield + Math.random() * 0.5) * 100) / 100,
+        area: Math.round((Math.random() * 10 + 1) * 100) / 100,
+        plantingDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
+        accuracy: Math.round((Math.random() * 30 + 70))
+      }
+    ],
+    message: 'Demo mode - using simulated historical data'
+  };
+};
 
 // Validation schema for prediction request
 const predictionValidationSchema = Joi.object({
@@ -82,6 +114,12 @@ const predictYield = async (req, res) => {
 // Get historical comparison data
 const getHistoricalComparison = async (inputData) => {
   try {
+    // Check if MongoDB is available
+    if (mongoose.connection.readyState !== 1) {
+      // Return mock data if MongoDB is not connected
+      return getMockHistoricalData(inputData);
+    }
+
     // Find similar crops in the database
     const similarCrops = await Crop.find({
       cropType: inputData.cropType,
@@ -89,9 +127,9 @@ const getHistoricalComparison = async (inputData) => {
       'location.state': inputData.location.state,
       actualYield: { $exists: true, $ne: null }
     })
-    .sort({ createdAt: -1 })
-    .limit(10)
-    .lean();
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
 
     if (similarCrops.length === 0) {
       return {
@@ -103,7 +141,7 @@ const getHistoricalComparison = async (inputData) => {
     }
 
     const yields = similarCrops.map(crop => crop.actualYield);
-    const averageYield = yields.reduce((sum, yield) => sum + yield, 0) / yields.length;
+    const averageYield = yields.reduce((sum, yieldValue) => sum + yieldValue, 0) / yields.length;
     const minYield = Math.min(...yields);
     const maxYield = Math.max(...yields);
 
@@ -126,12 +164,8 @@ const getHistoricalComparison = async (inputData) => {
     };
   } catch (error) {
     console.error('Error getting historical comparison:', error);
-    return {
-      averageYield: null,
-      recordCount: 0,
-      yieldRange: { min: null, max: null },
-      message: 'Error retrieving historical data'
-    };
+    // Fallback to mock data on error
+    return getMockHistoricalData(inputData);
   }
 };
 
@@ -284,6 +318,39 @@ const calculateConfidenceScore = (crop, historicalData) => {
 // Get yield trends and analytics
 const getYieldAnalytics = async (req, res) => {
   try {
+    // Check if MongoDB is available
+    if (mongoose.connection.readyState !== 1) {
+      // Return mock analytics data
+      const mockData = {
+        monthlyTrends: [
+          { _id: { year: 2024, month: 1 }, avgPredictedYield: 4.2, avgActualYield: 3.9, totalArea: 150, count: 12 },
+          { _id: { year: 2024, month: 2 }, avgPredictedYield: 4.5, avgActualYield: 4.1, totalArea: 180, count: 15 },
+          { _id: { year: 2024, month: 3 }, avgPredictedYield: 4.8, avgActualYield: 4.4, totalArea: 220, count: 18 }
+        ],
+        correlationData: [
+          { actualYield: 4.2, rainfall: 1200, avgTemperature: 28, totalFertilizer: 150, pH: 6.5, humidity: 75 },
+          { actualYield: 3.8, rainfall: 800, avgTemperature: 32, totalFertilizer: 100, pH: 7.0, humidity: 65 },
+          { actualYield: 5.1, rainfall: 1400, avgTemperature: 26, totalFertilizer: 200, pH: 6.8, humidity: 80 }
+        ],
+        topRegions: [
+          { _id: { state: 'Punjab', district: 'Ludhiana' }, avgYield: 5.2, totalArea: 500, count: 25 },
+          { _id: { state: 'Haryana', district: 'Karnal' }, avgYield: 4.8, totalArea: 350, count: 18 }
+        ]
+      };
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...mockData,
+          summary: {
+            totalRecords: 50,
+            analysisDate: new Date().toISOString(),
+            note: 'Demo mode - using simulated data (MongoDB not available)'
+          }
+        }
+      });
+    }
+
     const { cropType, season, state, year } = req.query;
     
     // Build match filter

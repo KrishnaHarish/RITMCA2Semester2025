@@ -2,7 +2,7 @@
  * Error handling middleware
  * Handles all errors thrown in the application
  */
-const errorHandler = (error, req, res, next) => {
+const errorHandler = (error, req, res, _next) => {
   console.error('Error caught by middleware:', error);
 
   // Default error object
