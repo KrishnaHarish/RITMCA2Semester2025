@@ -1,0 +1,124 @@
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
+                    <h2 class="h4 text-dark">Welcome Back!</h2>
+                    <p class="text-muted">Sign in to your account</p>
+                </div>
+
+                <form id="loginForm" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="identifier" class="form-label">Email or Username</label>
+                        <input type="text" class="form-control" id="identifier" name="identifier" required>
+                        <div class="invalid-feedback">
+                            Please enter your email or username.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password')">
+                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter your password.
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Sign In
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-muted">
+                            Don't have an account? 
+                            <a href="/register" class="text-decoration-none">Sign up here</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Validate form
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing In...';
+    submitBtn.disabled = true;
+    
+    try {
+        const formData = new FormData(form);
+        const data = {
+            identifier: formData.get('identifier'),
+            password: formData.get('password')
+        };
+        
+        const response = await axios.post('/auth/login', data);
+        
+        if (response.data.success) {
+            app.currentUser = response.data.data.user;
+            app.updateNavigation();
+            app.showAlert('Login successful! Welcome back.', 'success');
+            
+            // Redirect to dashboard or intended page
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect') || '/dashboard';
+            
+            setTimeout(() => {
+                window.location.href = redirect;
+            }, 1000);
+        }
+    } catch (error) {
+        // Error handling is done by axios interceptor
+        console.error('Login error:', error);
+    } finally {
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(inputId + 'ToggleIcon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+// Auto-focus on first input
+document.getElementById('identifier').focus();
+</script>
