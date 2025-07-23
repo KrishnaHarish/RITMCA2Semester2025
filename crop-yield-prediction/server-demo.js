@@ -71,7 +71,7 @@ app.listen(PORT, () => {
   console.log(`🚀 Crop Yield Prediction System running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 Access the application at: http://localhost:${PORT}`);
-  console.log(`🎯 Demo Mode: All functionality available with mock data`);
+  console.log('🎯 Demo Mode: All functionality available with mock data');
   console.log(`📋 Try the health check: http://localhost:${PORT}/health`);
 });
 
