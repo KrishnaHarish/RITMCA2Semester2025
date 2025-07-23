@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include('partials/navbar') %>
+    
+    <!-- Alert Messages -->
+    <div id="alert-container"></div>
+    
+    <!-- Hero Section -->
+    <section class="hero-section bg-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Welcome to Cooking Blog</h1>
+                    <p class="lead mb-4">
+                        Discover amazing recipes, share your culinary creations, and connect with 
+                        food lovers from around the world. From quick weeknight dinners to elaborate 
+                        feast preparations, find your next favorite dish here.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="/recipes" class="btn btn-light btn-lg">
+                            <i class="fas fa-search me-2"></i>Browse Recipes
+                        </a>
+                        <a href="/create-recipe" class="btn btn-outline-light btn-lg" id="create-recipe-btn">
+                            <i class="fas fa-plus me-2"></i>Share Recipe
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="/images/hero-cooking.jpg" alt="Cooking" class="img-fluid rounded shadow" 
+                         style="max-height: 400px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Recipes Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-6 fw-bold">Popular Recipes</h2>
+                    <p class="text-muted">Most viewed recipes by our community</p>
+                </div>
+            </div>
+            <div class="row" id="popular-recipes">
+                <!-- Popular recipes will be loaded here -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Highly Rated Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-6 fw-bold">Highly Rated</h2>
+                    <p class="text-muted">Top-rated recipes by our community</p>
+                </div>
+            </div>
+            <div class="row" id="highly-rated-recipes">
+                <!-- Highly rated recipes will be loaded here -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <h2 class="display-6 fw-bold">Why Choose Cooking Blog?</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="feature-card p-4">
+                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                        <h4>Community Driven</h4>
+                        <p class="text-muted">
+                            Join a vibrant community of home cooks and professional chefs 
+                            sharing their favorite recipes and cooking tips.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="feature-card p-4">
+                        <i class="fas fa-star fa-3x text-primary mb-3"></i>
+                        <h4>Quality Recipes</h4>
+                        <p class="text-muted">
+                            All recipes are tested and rated by our community. Find only 
+                            the best recipes that actually work in your kitchen.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="feature-card p-4">
+                        <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+                        <h4>Easy to Use</h4>
+                        <p class="text-muted">
+                            Simple, clean interface that works on all devices. Cook with 
+                            confidence using our step-by-step instructions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/js/auth.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/home.js"></script>
+</body>
+</html>
