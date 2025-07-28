@@ -1,11 +1,11 @@
-Create a React functional component called DriveManager that simulates a simple file drive/storage system. The component should allow users to upload files (simulated), display a list of stored files, and provide options to view file details, download (simulated), and delete files. Use useState to manage the file list and implement the following features:
-1. Add new files with name, size, and type
-2. Display files in a grid/list format  
-3. Show file icons based on file type
-4. Include file operations (view details, download, delete)
-5. Use inline CSS for styling with a clean, modern interface
+// Create a React functional component called DriveManager that simulates a simple file drive/storage system. The component should allow users to upload files (simulated), display a list of stored files, and provide options to view file details, download (simulated), and delete files. Use useState to manage the file list and implement the following features:
+// 1. Add new files with name, size, and type
+// 2. Display files in a grid/list format  
+// 3. Show file icons based on file type
+// 4. Include file operations (view details, download, delete)
+// 5. Use inline CSS for styling with a clean, modern interface
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function DriveManager() {
   const [files, setFiles] = useState([
@@ -57,62 +57,105 @@ function DriveManager() {
   };
 
   const containerStyle = {
-    // Add your CSS styles here
+    maxWidth: '800px',
+    margin: '20px auto',
+    padding: '20px',
+    fontFamily: 'Arial, sans-serif',
+    backgroundColor: '#f5f5f5',
+    borderRadius: '10px'
   };
 
   const headerStyle = {
-    // Add your CSS styles here
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: '30px'
   };
 
   const uploadSectionStyle = {
-    // Add your CSS styles here
+    backgroundColor: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
   };
 
   const inputStyle = {
-    // Add your CSS styles here
+    width: '70%',
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    marginRight: '10px'
   };
 
   const buttonStyle = {
-    // Add your CSS styles here
+    padding: '10px 20px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer'
   };
 
   const filesGridStyle = {
-    // Add your CSS styles here
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+    gap: '15px',
+    marginBottom: '20px'
   };
 
   const fileCardStyle = {
-    // Add your CSS styles here
+    backgroundColor: '#fff',
+    padding: '15px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    border: '1px solid #e0e0e0'
   };
 
   const fileHeaderStyle = {
-    // Add your CSS styles here
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '10px'
   };
 
   const fileIconStyle = {
-    // Add your CSS styles here
+    fontSize: '24px',
+    marginRight: '10px'
   };
 
   const fileNameStyle = {
-    // Add your CSS styles here
+    fontWeight: 'bold',
+    color: '#333',
+    fontSize: '14px'
   };
 
   const fileInfoStyle = {
-    // Add your CSS styles here
+    color: '#666',
+    fontSize: '12px',
+    marginBottom: '10px'
   };
 
   const fileActionsStyle = {
-    // Add your CSS styles here
+    display: 'flex',
+    gap: '5px'
   };
 
   const actionButtonStyle = {
-    // Add your CSS styles here
+    padding: '5px 10px',
+    fontSize: '12px',
+    border: 'none',
+    borderRadius: '3px',
+    cursor: 'pointer'
   };
 
   const detailsStyle = {
-    // Add your CSS styles here
+    backgroundColor: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
   };
 
-  <div style={containerStyle}>
+  return (
+    <div style={containerStyle}>
     <h1 style={headerStyle}>My Drive Manager</h1>
     
     <div style={uploadSectionStyle}>
@@ -186,29 +229,62 @@ function DriveManager() {
 export default DriveManager;
 
 // Exercise 2: Create a file search and filter component
-Create a React component called FileSearchFilter that allows users to search files by name and filter by file type. Integrate this with the DriveManager component above.
-
-import React, { useState } from 'react';
+// Create a React component called FileSearchFilter that allows users to search files by name and filter by file type. Integrate this with the DriveManager component above.
 
 function FileSearchFilter({ files, onFilteredFiles }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
 
+  // Filter logic implementation
+  useEffect(() => {
+    let filteredFiles = files;
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      filteredFiles = filteredFiles.filter(file =>
+        file.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by file type
+    if (filterType !== 'all') {
+      filteredFiles = filteredFiles.filter(file => file.type === filterType);
+    }
+
+    onFilteredFiles(filteredFiles);
+  }, [files, searchTerm, filterType, onFilteredFiles]);
+
   const searchInputStyle = {
-    // Add your CSS styles here
+    width: '60%',
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    marginRight: '10px',
+    fontSize: '14px'
   };
 
   const filterSelectStyle = {
-    // Add your CSS styles here
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    fontSize: '14px',
+    backgroundColor: '#fff',
+    cursor: 'pointer'
   };
 
   const filterContainerStyle = {
-    // Add your CSS styles here
+    backgroundColor: '#fff',
+    padding: '15px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
   };
 
-  // Filter logic implementation needed here
-
-  <div style={filterContainerStyle}>
+  return (
+    <div style={filterContainerStyle}>
     <input
       type="text"
       placeholder="Search files..."
