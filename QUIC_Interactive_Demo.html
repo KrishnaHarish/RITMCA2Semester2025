@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIC Protocol Analysis Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            margin: 20px 0;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .demo-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .demo-section h2 {
+            color: #5a67d8;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f7fafc;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            background: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #cbd5e0;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .protocol-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .protocol-stack {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .protocol-layer {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .protocol-layer:hover {
+            transform: scale(1.05);
+        }
+
+        .packet-visualization {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .packet-header {
+            background: #4299e1;
+            color: white;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+            font-weight: 600;
+        }
+
+        .packet-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .packet-field:last-child {
+            border-bottom: none;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .packet-field:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .field-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .field-value {
+            color: #4a5568;
+            font-family: 'Courier New', monospace;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .simulation-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .primary-btn {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #4c51bf;
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .secondary-btn:hover {
+            background: #cbd5e0;
+        }
+
+        .success-btn {
+            background: #48bb78;
+            color: white;
+        }
+
+        .success-btn:hover {
+            background: #38a169;
+        }
+
+        .log-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #63b3ed;
+        }
+
+        .log-info {
+            color: #68d391;
+        }
+
+        .log-warning {
+            color: #fbb962;
+        }
+
+        .log-error {
+            color: #fc8181;
+        }
+
+        .connection-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .endpoint {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+
+        .endpoint-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .connection-arrow {
+            flex: 1;
+            text-align: center;
+            margin: 0 20px;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #5a67d8;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .wireshark-filters {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .filter-item {
+            background: white;
+            border-left: 4px solid #5a67d8;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .filter-code {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 5px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #5a67d8;
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .feature-description {
+            color: #4a5568;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .protocol-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 QUIC Protocol Analysis Demo</h1>
+            <p>Interactive Demonstration of QUIC vs HTTP/2 Performance</p>
+            <p><strong>Computer Networks | MCA24 | Dr Manjunath M | RIT Bangalore</strong></p>
+        </div>
+
+        <!-- Protocol Comparison Section -->
+        <div class="demo-section">
+            <h2>📊 Protocol Stack Comparison</h2>
+            <div class="protocol-comparison">
+                <div class="protocol-stack">
+                    <h3>Traditional HTTP/2 Stack</h3>
+                    <div class="protocol-layer">HTTP/2</div>
+                    <div class="protocol-layer">TLS 1.2/1.3</div>
+                    <div class="protocol-layer">TCP</div>
+                    <div class="protocol-layer">IP</div>
+                    <div class="protocol-layer">Ethernet</div>
+                </div>
+                <div class="protocol-stack">
+                    <h3>Modern QUIC Stack</h3>
+                    <div class="protocol-layer">HTTP/3</div>
+                    <div class="protocol-layer">QUIC (includes TLS 1.3)</div>
+                    <div class="protocol-layer">UDP</div>
+                    <div class="protocol-layer">IP</div>
+                    <div class="protocol-layer">Ethernet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Tabs Section -->
+        <div class="demo-section">
+            <h2>🔍 Interactive Protocol Analysis</h2>
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('handshake')">Connection Handshake</button>
+                <button class="tab" onclick="showTab('packets')">Packet Structure</button>
+                <button class="tab" onclick="showTab('performance')">Performance Metrics</button>
+                <button class="tab" onclick="showTab('simulation')">Live Simulation</button>
+            </div>
+
+            <!-- Handshake Tab -->
+            <div id="handshake" class="tab-content active">
+                <h3>🤝 Connection Establishment Comparison</h3>
+                <div class="connection-diagram">
+                    <div class="endpoint">
+                        <div class="endpoint-icon">💻</div>
+                        <div>Client</div>
+                    </div>
+                    <div class="connection-arrow">
+                        <div class="arrow">→</div>
+                        <div style="font-size: 0.9em; margin-top: 10px;">
+                            <span id="handshake-status">Click "Start Demo" below</span>
+                        </div>
+                    </div>
+                    <div class="endpoint">
+                        <div class="endpoint-icon">🖥️</div>
+                        <div>Server</div>
+                    </div>
+                </div>
+                
+                <div class="simulation-controls">
+                    <button class="control-btn primary-btn" onclick="simulateHandshake('http2')">HTTP/2 Handshake (3 RTT)</button>
+                    <button class="control-btn success-btn" onclick="simulateHandshake('quic')">QUIC Handshake (0-1 RTT)</button>
+                    <button class="control-btn secondary-btn" onclick="resetHandshake()">Reset</button>
+                </div>
+
+                <div class="log-output" id="handshake-log">
+                    <div class="log-entry">Ready to demonstrate connection establishment...</div>
+                </div>
+            </div>
+
+            <!-- Packets Tab -->
+            <div id="packets" class="tab-content">
+                <h3>📦 QUIC Packet Structure Analysis</h3>
+                <div class="packet-visualization">
+                    <div class="packet-header">QUIC Initial Packet (1252 bytes)</div>
+                    <div class="packet-field">
+                        <span class="field-name">Header Form</span>
+                        <span class="field-value">Long (1)</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">Packet Type</span>
+                        <span class="field-value">Initial (0x00)</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">Version</span>
+                        <span class="field-value">0x00000001 (QUIC v1)</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">DCID Length</span>
+                        <span class="field-value">8 bytes</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">Destination Connection ID</span>
+                        <span class="field-value">83a2f5b7c1d4e9f2</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">SCID Length</span>
+                        <span class="field-value">8 bytes</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">Source Connection ID</span>
+                        <span class="field-value">12a4b6c8d2e5f7a9</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">Packet Number</span>
+                        <span class="field-value">0x00000001</span>
+                    </div>
+                    <div class="packet-field">
+                        <span class="field-name">Payload</span>
+                        <span class="field-value">[Encrypted TLS Handshake]</span>
+                    </div>
+                </div>
+
+                <div class="simulation-controls">
+                    <button class="control-btn primary-btn" onclick="showPacketType('initial')">Initial Packet</button>
+                    <button class="control-btn primary-btn" onclick="showPacketType('handshake')">Handshake Packet</button>
+                    <button class="control-btn primary-btn" onclick="showPacketType('data')">Data Packet</button>
+                </div>
+            </div>
+
+            <!-- Performance Tab -->
+            <div id="performance" class="tab-content">
+                <h3>⚡ Performance Comparison</h3>
+                <div class="performance-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value" id="connection-time">34ms</div>
+                        <div class="metric-label">Connection Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="data-streams">12</div>
+                        <div class="metric-label">Concurrent Streams</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="efficiency">94.3%</div>
+                        <div class="metric-label">Bandwidth Efficiency</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="packet-loss">0.2%</div>
+                        <div class="metric-label">Packet Loss Recovery</div>
+                    </div>
+                </div>
+
+                <h4>Load Time Comparison</h4>
+                <div style="margin: 20px 0;">
+                    <div style="margin: 10px 0;">
+                        <strong>HTTP/2 over TCP:</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <small>1.2 seconds</small>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <strong>HTTP/3 over QUIC:</strong>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;"></div>
+                        </div>
+                        <small>0.72 seconds (40% faster)</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Tab -->
+            <div id="simulation" class="tab-content">
+                <h3>🎮 Live Protocol Simulation</h3>
+                <div class="simulation-controls">
+                    <button class="control-btn primary-btn" onclick="startTrafficSimulation()">Start QUIC Traffic</button>
+                    <button class="control-btn secondary-btn" onclick="pauseSimulation()">Pause</button>
+                    <button class="control-btn success-btn" onclick="resetSimulation()">Reset</button>
+                </div>
+
+                <div class="log-output" id="simulation-log">
+                    <div class="log-entry"><span class="log-timestamp">[00:00:00.000]</span> <span class="log-info">Simulation ready - Click 'Start QUIC Traffic' to begin</span></div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h4>Current Session Statistics:</h4>
+                    <div class="performance-metrics">
+                        <div class="metric-card">
+                            <div class="metric-value" id="sim-packets">0</div>
+                            <div class="metric-label">Packets Sent</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="sim-streams">0</div>
+                            <div class="metric-label">Active Streams</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="sim-bandwidth">0 MB</div>
+                            <div class="metric-label">Data Transferred</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIC Features Section -->
+        <div class="demo-section">
+            <h2>✨ Key QUIC Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">0-RTT Connection</div>
+                    <div class="feature-description">Faster connection establishment with cached parameters from previous sessions</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-title">Built-in Encryption</div>
+                    <div class="feature-description">All packets encrypted by default with TLS 1.3 integration</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <div class="feature-title">Connection Migration</div>
+                    <div class="feature-description">Seamless network transitions (WiFi to cellular) without connection loss</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">Stream Multiplexing</div>
+                    <div class="feature-description">Independent streams eliminate head-of-line blocking issues</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wireshark Filters Section -->
+        <div class="demo-section">
+            <h2>🔍 Wireshark Analysis Filters</h2>
+            <div class="wireshark-filters">
+                <div class="filter-item">
+                    <div class="filter-title">Capture All QUIC Traffic</div>
+                    <div class="filter-code">quic</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-title">QUIC Handshake Packets</div>
+                    <div class="filter-code">quic.header_form == 1</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-title">QUIC Data Packets</div>
+                    <div class="filter-code">quic.header_form == 0</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-title">Specific Connection</div>
+                    <div class="filter-code">quic.connection.id == 83a2f5b7c1d4e9f2</div>
+                </div>
+                <div class="filter-item">
+                    <div class="filter-title">HTTP/3 over QUIC</div>
+                    <div class="filter-code">quic and http3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Handshake simulation
+        let handshakeTimeout;
+        
+        function simulateHandshake(protocol) {
+            const log = document.getElementById('handshake-log');
+            const status = document.getElementById('handshake-status');
+            
+            log.innerHTML = '';
+            clearTimeout(handshakeTimeout);
+            
+            if (protocol === 'http2') {
+                status.textContent = 'HTTP/2 Handshake in Progress...';
+                
+                // TCP SYN
+                addLogEntry(log, '0.000ms', 'TCP SYN sent', 'info');
+                
+                handshakeTimeout = setTimeout(() => {
+                    addLogEntry(log, '25.3ms', 'TCP SYN-ACK received', 'info');
+                    addLogEntry(log, '25.4ms', 'TCP ACK sent', 'info');
+                    addLogEntry(log, '25.5ms', 'TCP connection established', 'warning');
+                }, 500);
+                
+                handshakeTimeout = setTimeout(() => {
+                    addLogEntry(log, '45.7ms', 'TLS Client Hello sent', 'info');
+                }, 1000);
+                
+                handshakeTimeout = setTimeout(() => {
+                    addLogEntry(log, '78.2ms', 'TLS Server Hello received', 'info');
+                    addLogEntry(log, '78.9ms', 'Certificate verification', 'warning');
+                }, 1500);
+                
+                handshakeTimeout = setTimeout(() => {
+                    addLogEntry(log, '125.4ms', 'TLS handshake complete', 'warning');
+                    addLogEntry(log, '145.8ms', 'HTTP/2 connection ready', 'info');
+                    status.textContent = 'HTTP/2 Ready (145.8ms total)';
+                }, 2000);
+                
+            } else if (protocol === 'quic') {
+                status.textContent = 'QUIC Handshake in Progress...';
+                
+                addLogEntry(log, '0.000ms', 'QUIC Initial packet sent (includes TLS Hello)', 'info');
+                
+                handshakeTimeout = setTimeout(() => {
+                    addLogEntry(log, '23.4ms', 'QUIC Handshake response received', 'info');
+                    addLogEntry(log, '23.5ms', 'TLS handshake integrated', 'warning');
+                }, 500);
+                
+                handshakeTimeout = setTimeout(() => {
+                    addLogEntry(log, '34.1ms', 'QUIC connection established', 'info');
+                    addLogEntry(log, '34.2ms', 'HTTP/3 ready for data', 'info');
+                    status.textContent = 'QUIC Ready (34.1ms total - 76% faster!)';
+                }, 1000);
+            }
+        }
+        
+        function resetHandshake() {
+            clearTimeout(handshakeTimeout);
+            document.getElementById('handshake-log').innerHTML = '<div class="log-entry">Ready to demonstrate connection establishment...</div>';
+            document.getElementById('handshake-status').textContent = 'Click "Start Demo" below';
+        }
+        
+        function addLogEntry(logElement, time, message, type) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-timestamp">[${time}]</span> <span class="log-${type}">${message}</span>`;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // Packet structure demonstration
+        function showPacketType(type) {
+            const packetViz = document.querySelector('.packet-visualization');
+            
+            if (type === 'initial') {
+                packetViz.innerHTML = `
+                    <div class="packet-header">QUIC Initial Packet (1252 bytes)</div>
+                    <div class="packet-field"><span class="field-name">Header Form</span><span class="field-value">Long (1)</span></div>
+                    <div class="packet-field"><span class="field-name">Packet Type</span><span class="field-value">Initial (0x00)</span></div>
+                    <div class="packet-field"><span class="field-name">Version</span><span class="field-value">0x00000001 (QUIC v1)</span></div>
+                    <div class="packet-field"><span class="field-name">DCID Length</span><span class="field-value">8 bytes</span></div>
+                    <div class="packet-field"><span class="field-name">Destination Connection ID</span><span class="field-value">83a2f5b7c1d4e9f2</span></div>
+                    <div class="packet-field"><span class="field-name">SCID Length</span><span class="field-value">8 bytes</span></div>
+                    <div class="packet-field"><span class="field-name">Source Connection ID</span><span class="field-value">12a4b6c8d2e5f7a9</span></div>
+                    <div class="packet-field"><span class="field-name">Packet Number</span><span class="field-value">0x00000001</span></div>
+                    <div class="packet-field"><span class="field-name">Payload</span><span class="field-value">[Encrypted TLS Handshake]</span></div>
+                `;
+            } else if (type === 'handshake') {
+                packetViz.innerHTML = `
+                    <div class="packet-header">QUIC Handshake Packet (1200 bytes)</div>
+                    <div class="packet-field"><span class="field-name">Header Form</span><span class="field-value">Long (1)</span></div>
+                    <div class="packet-field"><span class="field-name">Packet Type</span><span class="field-value">Handshake (0x02)</span></div>
+                    <div class="packet-field"><span class="field-name">Version</span><span class="field-value">0x00000001</span></div>
+                    <div class="packet-field"><span class="field-name">DCID</span><span class="field-value">12a4b6c8d2e5f7a9</span></div>
+                    <div class="packet-field"><span class="field-name">SCID</span><span class="field-value">83a2f5b7c1d4e9f2</span></div>
+                    <div class="packet-field"><span class="field-name">Packet Number</span><span class="field-value">0x00000002</span></div>
+                    <div class="packet-field"><span class="field-name">Crypto Frame</span><span class="field-value">TLS Server Hello [Encrypted]</span></div>
+                    <div class="packet-field"><span class="field-name">ACK Frame</span><span class="field-value">Acknowledges packet 1</span></div>
+                `;
+            } else if (type === 'data') {
+                packetViz.innerHTML = `
+                    <div class="packet-header">QUIC 1-RTT Data Packet (1156 bytes)</div>
+                    <div class="packet-field"><span class="field-name">Header Form</span><span class="field-value">Short (0)</span></div>
+                    <div class="packet-field"><span class="field-name">Fixed Bit</span><span class="field-value">1</span></div>
+                    <div class="packet-field"><span class="field-name">Spin Bit</span><span class="field-value">0</span></div>
+                    <div class="packet-field"><span class="field-name">Key Phase</span><span class="field-value">0</span></div>
+                    <div class="packet-field"><span class="field-name">DCID</span><span class="field-value">83a2f5b7c1d4e9f2</span></div>
+                    <div class="packet-field"><span class="field-name">Packet Number</span><span class="field-value">0x0000005A</span></div>
+                    <div class="packet-field"><span class="field-name">Stream Frame</span><span class="field-value">Stream ID: 4 [HTTP/3 Data]</span></div>
+                    <div class="packet-field"><span class="field-name">Payload</span><span class="field-value">[Encrypted Application Data]</span></div>
+                `;
+            }
+        }
+
+        // Simulation functionality
+        let simulationInterval;
+        let simulationRunning = false;
+        let packetCount = 0;
+        let streamCount = 0;
+        let dataTransferred = 0;
+
+        function startTrafficSimulation() {
+            if (simulationRunning) return;
+            
+            simulationRunning = true;
+            const log = document.getElementById('simulation-log');
+            log.innerHTML = '';
+            
+            addLogEntry(log, '00:00:00.000', 'Starting QUIC traffic simulation...', 'info');
+            addLogEntry(log, '00:00:00.023', 'QUIC connection established', 'info');
+            
+            simulationInterval = setInterval(() => {
+                // Simulate various QUIC activities
+                const activities = [
+                    { msg: 'Stream frame sent (ID: ' + (streamCount % 8) + ')', type: 'info' },
+                    { msg: 'ACK frame received', type: 'warning' },
+                    { msg: 'New stream opened (ID: ' + streamCount + ')', type: 'info' },
+                    { msg: 'Flow control updated', type: 'warning' },
+                    { msg: 'Packet loss detected - retransmitting', type: 'error' },
+                ];
+                
+                if (Math.random() > 0.3) {
+                    const activity = activities[Math.floor(Math.random() * activities.length)];
+                    const timestamp = new Date().toISOString().substr(11, 12);
+                    addLogEntry(log, timestamp, activity.msg, activity.type);
+                    
+                    // Update counters
+                    packetCount += Math.floor(Math.random() * 3) + 1;
+                    if (activity.msg.includes('New stream')) {
+                        streamCount++;
+                    }
+                    dataTransferred += (Math.random() * 0.5);
+                    
+                    updateSimulationStats();
+                }
+            }, 500);
+        }
+
+        function pauseSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationRunning = false;
+                const log = document.getElementById('simulation-log');
+                addLogEntry(log, new Date().toISOString().substr(11, 12), 'Simulation paused', 'warning');
+            }
+        }
+
+        function resetSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationRunning = false;
+            }
+            
+            packetCount = 0;
+            streamCount = 0;
+            dataTransferred = 0;
+            updateSimulationStats();
+            
+            const log = document.getElementById('simulation-log');
+            log.innerHTML = '<div class="log-entry"><span class="log-timestamp">[00:00:00.000]</span> <span class="log-info">Simulation reset - Click \'Start QUIC Traffic\' to begin</span></div>';
+        }
+
+        function updateSimulationStats() {
+            document.getElementById('sim-packets').textContent = packetCount;
+            document.getElementById('sim-streams').textContent = streamCount;
+            document.getElementById('sim-bandwidth').textContent = dataTransferred.toFixed(1) + ' MB';
+        }
+
+        // Animate performance metrics on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const metrics = document.querySelectorAll('.metric-card');
+                metrics.forEach((metric, index) => {
+                    setTimeout(() => {
+                        metric.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            metric.style.transform = 'scale(1)';
+                        }, 200);
+                    }, index * 100);
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
